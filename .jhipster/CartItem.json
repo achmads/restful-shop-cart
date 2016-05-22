@@ -1,0 +1,31 @@
+{
+  "relationships": [
+    {
+      "relationshipId": 1,
+      "relationshipName": "product",
+      "otherEntityName": "product",
+      "relationshipType": "one-to-one",
+      "otherEntityField": "id",
+      "ownerSide": true,
+      "otherEntityRelationshipName": "cartItem"
+    },
+    {
+      "relationshipId": 2,
+      "relationshipName": "cart",
+      "otherEntityName": "cart",
+      "relationshipType": "many-to-one",
+      "otherEntityField": "id"
+    }
+  ],
+  "fields": [
+    {
+      "fieldId": 1,
+      "fieldName": "price",
+      "fieldType": "Double"
+    }
+  ],
+  "changelogDate": "20160522162836",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "no"
+}

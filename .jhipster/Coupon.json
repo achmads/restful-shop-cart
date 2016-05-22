@@ -1,0 +1,24 @@
+{
+  "relationships": [],
+  "fields": [
+    {
+      "fieldId": 1,
+      "fieldName": "code",
+      "fieldType": "String"
+    },
+    {
+      "fieldId": 2,
+      "fieldName": "discount",
+      "fieldType": "Double"
+    },
+    {
+      "fieldId": 3,
+      "fieldName": "percentage",
+      "fieldType": "Boolean"
+    }
+  ],
+  "changelogDate": "20160522162837",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no"
+}

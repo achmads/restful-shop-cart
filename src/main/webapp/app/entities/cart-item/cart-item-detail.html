@@ -1,0 +1,26 @@
+
+<div>
+    <h2><span translate="jhipsterApp.cartItem.detail.title">Cart Item</span> {{vm.cartItem.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="jhipsterApp.cartItem.price">Price</span></dt>
+        <dd>
+            <span>{{vm.cartItem.price}}</span>
+        </dd>
+        <dt><span translate="jhipsterApp.cartItem.product">Product</span></dt>
+        <dd>
+            <a ui-sref="product-detail({id:vm.cartItem.productId})">{{vm.cartItem.productId}}</a>
+        </dd>
+        <dt><span translate="jhipsterApp.cartItem.cart">Cart</span></dt>
+        <dd>
+            <a ui-sref="cart-detail({id:vm.cartItem.cartId})">{{vm.cartItem.cartId}}</a>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            onclick="window.history.back()"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+</div>

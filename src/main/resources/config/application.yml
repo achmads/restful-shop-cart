@@ -39,7 +39,13 @@ spring:
 
 security:
     basic:
-        enabled: false
+        enabled: true
+        path: /api/**
+    user:
+        name: user
+        password: user
+        role: USER
+
 
 # ===================================================================
 # JHipster specific properties

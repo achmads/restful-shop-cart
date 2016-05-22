@@ -1,0 +1,31 @@
+{
+  "relationships": [
+    {
+      "relationshipId": 1,
+      "relationshipName": "items",
+      "otherEntityName": "cartItem",
+      "relationshipType": "one-to-many",
+      "otherEntityRelationshipName": "cart"
+    },
+    {
+      "relationshipId": 2,
+      "relationshipName": "coupon",
+      "otherEntityName": "coupon",
+      "relationshipType": "one-to-one",
+      "otherEntityField": "id",
+      "ownerSide": true,
+      "otherEntityRelationshipName": "cart"
+    }
+  ],
+  "fields": [
+    {
+      "fieldId": 1,
+      "fieldName": "amount",
+      "fieldType": "Double"
+    }
+  ],
+  "changelogDate": "20160522162838",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no"
+}

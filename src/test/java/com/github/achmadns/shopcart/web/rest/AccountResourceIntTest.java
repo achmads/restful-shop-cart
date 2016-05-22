@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = JhipsterApp.class)
 @WebAppConfiguration
-@IntegrationTest
+@IntegrationTest()
 public class AccountResourceIntTest {
 
     @Inject

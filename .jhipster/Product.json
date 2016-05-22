@@ -1,0 +1,34 @@
+{
+  "relationships": [],
+  "fields": [
+    {
+      "fieldId": 1,
+      "fieldName": "shortname",
+      "fieldType": "String"
+    },
+    {
+      "fieldId": 2,
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldId": 3,
+      "fieldName": "unit",
+      "fieldType": "String"
+    },
+    {
+      "fieldId": 4,
+      "fieldName": "price",
+      "fieldType": "Double"
+    },
+    {
+      "fieldId": 5,
+      "fieldName": "stock",
+      "fieldType": "Long"
+    }
+  ],
+  "changelogDate": "20160522162835",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no"
+}

@@ -1,0 +1,24 @@
+{
+    "jhipsterApp": {
+        "cartItem" : {
+            "home": {
+                "title": "Cart Items",
+                "createLabel": "Create a new Cart Item",
+                "createOrEditLabel": "Create or edit a Cart Item",
+                "search": "Search for Cart Item"
+            },
+            "created": "A new Cart Item is created with identifier {{ param }}",
+            "updated": "A Cart Item is updated with identifier {{ param }}",
+            "deleted": "A Cart Item is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Cart Item {{ id }}?"
+            },
+            "detail": {
+                "title": "Cart Item"
+            },
+            "price": "Price",
+            "product": "Product",
+            "cart": "Cart"
+        }
+    }
+}
