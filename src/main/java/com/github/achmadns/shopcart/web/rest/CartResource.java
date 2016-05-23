@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -54,7 +53,6 @@ public class CartResource {
     private CartItemMapper cartItemMapper;
     @Inject
     private CouponRepository couponRepository;
-    private final Map<String, Long> carts = new ConcurrentHashMap<>(4);
 
     @RequestMapping(value = "/carts/{visitor:.+}/item/{quantity}/{productName}",
         method = RequestMethod.POST,
@@ -64,8 +62,8 @@ public class CartResource {
                                            @PathVariable("quantity") int quantity,
                                            @PathVariable("productName") String productName) {
         final CartItemDTO item = new CartItemDTO();
-        final Long cartId = carts.get(visitor);
-        final Cart cart = cartId == null ? new Cart() : cartRepository.findOne(cartId);
+        final Cart cart = cartRepository.findBySession(visitor).orElse(new Cart());
+        cart.setSession(visitor);
         final CartItem cartItem = new CartItem();
         final Optional<Product> product = productRepository.findByShortname(productName);
         if (!product.isPresent())
@@ -73,9 +71,9 @@ public class CartResource {
         cartItem.setProduct(product.get());
         cartItem.setPrice(product.get().getPrice() * quantity);
         cartItem.setCart(cart);
+        cartItem.setQuantity(quantity);
         cart.getItems().add(cartItem);
         cartRepository.saveAndFlush(cart);
-        if (null == cartId) carts.put(visitor, cart.getId());
         cartItemRepository.saveAndFlush(cartItem);
         item.setId(cartItem.getId());
         item.setPrice(cartItem.getPrice());
@@ -90,10 +88,11 @@ public class CartResource {
     @Transactional
     public void remove(@PathVariable("visitor") String visitor,
                        @PathVariable("productName") String productName) {
-        final Cart cart = cartRepository.findOne(carts.get(visitor));
-        if (null == cart)
+        final Optional<Cart> cart = cartRepository.findBySession(visitor);
+        if (!cart.isPresent())
             return;
-        final Set<CartItem> items = cart.getItems();
+        final Cart existing = cart.get();
+        final Set<CartItem> items = existing.getItems();
         final Map<Boolean, List<CartItem>> filtered = items.stream().collect(Collectors.partitioningBy(new Predicate<CartItem>() {
             @Override
             public boolean test(CartItem cartItem) {
@@ -102,8 +101,8 @@ public class CartResource {
         }));
         final List<CartItem> cartItems = filtered.get(false);
         cartItemRepository.deleteInBatch(filtered.get(true));
-        cart.setItems(cartItems.stream().collect(Collectors.toSet()));
-        cartRepository.saveAndFlush(cart);
+        existing.setItems(cartItems.stream().collect(Collectors.toSet()));
+        cartRepository.saveAndFlush(existing);
     }
 
     @RequestMapping(value = "/carts/invoice/{visitor:.+}",
@@ -112,11 +111,12 @@ public class CartResource {
     @Transactional
     public ResponseEntity<CartDTO> getInvoice(@PathVariable("visitor") String visitor) {
         final CartDTO dto = new CartDTO();
-        final Cart cart = cartRepository.findOne(carts.get(visitor));
-        if (null == cart)
+        final Optional<Cart> cart = cartRepository.findBySession(visitor);
+        if (!cart.isPresent())
             return ResponseEntity.badRequest().body(dto);
-        dto.setTotal(processCartItems(dto, cart));
-        cartRepository.saveAndFlush(cart);
+        final Cart existing = cart.get();
+        dto.setTotal(processCartItems(dto, existing));
+        cartRepository.saveAndFlush(existing);
         return ResponseEntity.ok(dto);
     }
 
@@ -137,24 +137,25 @@ public class CartResource {
     public ResponseEntity<CartDTO> getInvoiceWithCoupon(@PathVariable("visitor") String visitor,
                                                         @PathVariable("coupon") String code) {
         final CartDTO dto = new CartDTO();
-        final Cart cart = cartRepository.findOne(carts.get(visitor));
-        if (null == cart)
+        final Optional<Cart> cart = cartRepository.findBySession(visitor);
+        if (!cart.isPresent())
             return ResponseEntity.badRequest().body(dto);
-        final Double total = processCartItems(dto, cart);
+        final Cart existing = cart.get();
+        final Double total = processCartItems(dto, existing);
         final Optional<Coupon> coupon = couponRepository.findByCode(code);
         if (coupon.isPresent()) {
             final Double discount = coupon.get().getDiscount();
             if (coupon.get().isPercentage()) {
                 final double percentageDiscount = discount * total / 100;
-                cart.setAmount(total - percentageDiscount);
+                existing.setAmount(total - percentageDiscount);
                 dto.setDiscount(percentageDiscount);
             } else {
-                cart.setAmount(total - discount);
+                existing.setAmount(total - discount);
                 dto.setDiscount(discount);
             }
         }
-        dto.setTotal(cart.getAmount());
-        cartRepository.saveAndFlush(cart);
+        dto.setTotal(existing.getAmount());
+        cartRepository.saveAndFlush(existing);
         return ResponseEntity.ok(dto);
     }
 
