@@ -16,6 +16,6 @@ Modify the project as needed.
 
 ## What's available
 
-See [Scenario Test](src/test/features/shopping_and_check_out.feature). 
+See [Scenario Test](src/test/features/shopping_and_check_out.feature) to see what the rest API does and click [here](src/test/java/com/github/achmadns/shopcart/cucumber/stepdefs/ShoppingSteps.java) to see steps definition.
 
-See [ShoppingEndpointsIntTest](src/test/java/com/github/achmadns/shopcart/web/rest/ShoppingEndpointsIntTest.java) for useful endpoints.
+See [ShoppingEndpointsIntTest](src/test/java/com/github/achmadns/shopcart/web/rest/ShoppingEndpointsIntTest.java) for simple integration test.
