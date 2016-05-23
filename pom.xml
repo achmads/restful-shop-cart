@@ -10,10 +10,10 @@
     </parent>
 
     <groupId>com.github.achmadns.shopcart</groupId>
-    <artifactId>jhipster</artifactId>
+    <artifactId>restful-shop-cart</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>jhipster</name>
+    <name>RESTful Shop Cart Example</name>
 
     <prerequisites>
         <maven>3.0.0</maven>

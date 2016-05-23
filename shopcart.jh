@@ -1,0 +1,39 @@
+entity Product {
+	productId String,
+	name String,
+    unit String,
+    price Double,
+    stock Long
+}
+
+entity CartItem{
+	price Double
+}
+
+entity Coupon{
+	couponId String,
+    discount Double,
+    percentage Float
+}
+
+entity Cart{
+	amount Double
+}
+
+relationship OneToOne{
+	CartItem{product} to Product
+}
+
+relationship OneToMany{
+	Cart{items} to CartItem
+}
+
+relationship OneToMany{
+	Cart{coupon} to Coupon
+}
+
+dto Cart with mapstruct
+
+service Employee with serviceClass
+
+	
