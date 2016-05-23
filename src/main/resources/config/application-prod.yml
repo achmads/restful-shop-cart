@@ -43,6 +43,8 @@ spring:
         password:
     thymeleaf:
         cache: true
+    profiles:
+      active:
 
 liquibase:
     contexts: prod
@@ -53,7 +55,6 @@ server:
         enabled: true
         mime-types: text/html,text/xml,text/plain,text/css, application/javascript, application/json
         min-response-size: 1024
-
 # ===================================================================
 # JHipster specific properties
 # ===================================================================
@@ -89,4 +90,8 @@ jhipster:
             port: 5000
             queueSize: 512
     swagger: # swagger is disabled. It can be disabled by pasing 'no-swagger' profile at run time as well
+        enabled: false
+
+security:
+    basic:
         enabled: false

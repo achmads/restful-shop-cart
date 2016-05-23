@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
 
@@ -46,6 +47,7 @@ public class ShoppingEndpointsIntTest {
         assertThat(item.getCartId()).isNotNull();
         assertThat(item.getProductId()).isNotNull();
         assertThat(item.getPrice()).isEqualTo(100D);
+        assertThat(item.getQuantity()).isEqualTo(1);
 
     }
 
@@ -85,11 +87,52 @@ public class ShoppingEndpointsIntTest {
 
     @Test
     public void f__get_invoice_with_discount_per_visitor() {
-        final ResponseEntity<CartDTO> response = rest.getForEntity(baseUrl + "/api/carts/invoice/achmad/coupon/welcome", CartDTO.class);
+        final ResponseEntity<CartDTO> response = rest.getForEntity(baseUrl + "/api/carts/invoice/achmad/coupon/welcome",
+            CartDTO.class);
         assertThat(response.getStatusCode()).isEqualTo(OK);
         final CartDTO cart = response.getBody();
         assertThat(cart.getDiscount()).isNotNull();
         assertThat(cart.getItems().size()).isEqualTo(1);
         assertThat(cart.getTotal()).isEqualTo(17D);
     }
+
+    @Test
+    public void g__get_invoice_with_discount_yet_not_found_coupon_per_visitor() {
+        final ResponseEntity<CartDTO> response = rest.getForEntity(baseUrl + "/api/carts/invoice/achmad/coupon/xxx",
+            CartDTO.class);
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        final CartDTO cart = response.getBody();
+        assertThat(cart.getDiscount()).isNull();
+        assertThat(cart.getItems().size()).isEqualTo(1);
+        assertThat(cart.getTotal()).isEqualTo(20D);
+    }
+
+
+    @Test
+    public void zzz__put_not_found_item_into_cart_per_visitor_should_failed() {
+        final ResponseEntity<CartItemDTO> response = rest.postForEntity(baseUrl + "/api/carts/xxx/item/1/tvx", null,
+            CartItemDTO.class);
+        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+        final CartItemDTO item = response.getBody();
+        assertThat(item.getId()).isNull();
+
+    }
+
+    @Test
+    public void zzz__get_not_found_invoice_per_visitor_() {
+        final ResponseEntity<CartDTO> response = rest.getForEntity(baseUrl + "/api/carts/invoice/xxx", CartDTO.class);
+        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+        final CartDTO cart = response.getBody();
+        assertThat(cart.getTotal()).isNull();
+    }
+
+    @Test
+    public void zzz__get_not_found_invoice_with_discount_per_visitor() {
+        final ResponseEntity<CartDTO> response = rest.getForEntity(baseUrl + "/api/carts/invoice/xxx/coupon/ramadhan",
+            CartDTO.class);
+        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+        final CartDTO cart = response.getBody();
+        assertThat(cart.getTotal()).isNull();
+    }
+
 }

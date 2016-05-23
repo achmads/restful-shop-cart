@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
 public class ShoppingSteps extends StepDefs {
@@ -39,44 +40,53 @@ public class ShoppingSteps extends StepDefs {
     @Given("database preparation")
     @Transactional
     public void clean_db() {
+        cartItemRepository.deleteAll();
         cartRepository.deleteAll();
         assertThat(cartItemRepository.count()).isEqualTo(0L);
         assertThat(cartRepository.count()).isEqualTo(0L);
     }
 
-    @Given("^visitors pick their items:")
-    public void pick_items(DataTable data) throws Throwable {
-        // example
-        // | achmad | 1 | tv           | 100  |
+    @Given("^visitors pick non existent items:")
+    public void pick__non_existent_items(DataTable data) throws Throwable {
+        postCartItems(data, BAD_REQUEST);
+    }
+
+    private void postCartItems(DataTable data, HttpStatus expectedResponseStatus) {
         for (DataTableRow row : data.getGherkinRows()) {
             final List<String> cells = row.getCells();
             log.info("Data line {}: {}", row.getLine(), cells);
             final HttpStatus statusCode = rest.postForEntity(baseUrl + "/api/carts/{visitor}/item/{quantity}/{productShortName}", null,
                 CartItemDTO.class, cells.subList(0, cells.size() - 1).toArray(new Object[]{})).getStatusCode();
-            assertThat(statusCode).isEqualTo(OK);
+            assertThat(statusCode).isEqualTo(expectedResponseStatus);
         }
     }
 
-    @When("^([\\w]*) checks out the cart$")
-    public void checkout_cart(String visitor) {
+    @Given("^visitors pick their items:")
+    public void pick_items(DataTable data) throws Throwable {
+        postCartItems(data, OK);
+    }
+
+    @When("^([\\w]*) checks out the cart and got USD ([\\d\\.]*) invoice$")
+    public void checkout_cart(String visitor, Double invoice) {
         log.info("visitor", visitor);
         final ResponseEntity<CartDTO> response = rest.getForEntity(baseUrl + "/api/carts/invoice/{coupon}", CartDTO.class, visitor);
         assertThat(response.getStatusCode()).isEqualTo(OK);
-        invoices.put(visitor, response.getBody().getTotal());
+        assertThat(response.getBody().getTotal()).isEqualTo(invoice);
     }
 
-    @When("^([\\w]*) checks out the cart with coupon ([\\w]*)$")
-    public void checkout_cart_with_coupon(String visitor, String coupon) {
+    @When("^([\\w]*) checks out the cart and got nothing$")
+    public void checkout_cart(String visitor) {
+        log.info("visitor", visitor);
+        final ResponseEntity<CartDTO> response = rest.getForEntity(baseUrl + "/api/carts/invoice/{coupon}", CartDTO.class, visitor);
+        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+    }
+
+    @When("^([\\w]*) checks out the cart with coupon ([\\w]*) and got USD ([\\d\\.]*) invoice$")
+    public void checkout_cart_with_coupon(String visitor, String coupon, Double invoice) {
         log.info("{} checks out with coupon {}", visitor, coupon);
         final ResponseEntity<CartDTO> response = rest.getForEntity(baseUrl + "/api/carts/invoice/{visitor}/coupon/{coupon}", CartDTO.class, visitor, coupon);
         assertThat(response.getStatusCode()).isEqualTo(OK);
-        invoices.put(visitor, response.getBody().getTotal());
-    }
-
-    @Then("^([\\w]*) confirms he has USD ([\\d\\.]*) invoice$")
-    public void check_invoice(String visitor, Double invoice) {
-        log.info("{} has to pay USD {}", visitor, invoice);
-        assertThat(invoices.get(visitor)).isEqualTo(invoice);
+        assertThat(response.getBody().getTotal()).isEqualTo(invoice);
     }
 
     @Then("^([\\w]*) cancel the ([\\w-]+)$")

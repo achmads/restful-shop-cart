@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -33,6 +32,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+
+import static java.util.stream.Collectors.partitioningBy;
 
 /**
  * REST controller for managing Cart.
@@ -61,13 +63,12 @@ public class CartResource {
     public ResponseEntity<CartItemDTO> add(@PathVariable("visitor") String visitor,
                                            @PathVariable("quantity") int quantity,
                                            @PathVariable("productName") String productName) {
-        final CartItemDTO item = new CartItemDTO();
         final Cart cart = cartRepository.findBySession(visitor).orElse(new Cart());
         cart.setSession(visitor);
         final CartItem cartItem = new CartItem();
         final Optional<Product> product = productRepository.findByShortname(productName);
         if (!product.isPresent())
-            return ResponseEntity.badRequest().body(item);
+            return ResponseEntity.badRequest().body(new CartItemDTO());
         cartItem.setProduct(product.get());
         cartItem.setPrice(product.get().getPrice() * quantity);
         cartItem.setCart(cart);
@@ -75,11 +76,7 @@ public class CartResource {
         cart.getItems().add(cartItem);
         cartRepository.saveAndFlush(cart);
         cartItemRepository.saveAndFlush(cartItem);
-        item.setId(cartItem.getId());
-        item.setPrice(cartItem.getPrice());
-        item.setCartId(cartItem.getCart().getId());
-        item.setProductId(product.get().getId());
-        return ResponseEntity.ok(item);
+        return ResponseEntity.ok(cartItemMapper.cartItemToCartItemDTO(cartItem));
     }
 
     @RequestMapping(value = "/carts/{visitor:.+}/item/{productName}",
@@ -93,12 +90,9 @@ public class CartResource {
             return;
         final Cart existing = cart.get();
         final Set<CartItem> items = existing.getItems();
-        final Map<Boolean, List<CartItem>> filtered = items.stream().collect(Collectors.partitioningBy(new Predicate<CartItem>() {
-            @Override
-            public boolean test(CartItem cartItem) {
-                return productName.equalsIgnoreCase(cartItem.getProduct().getShortname());
-            }
-        }));
+        final Map<Boolean, List<CartItem>> filtered = items.stream().collect(partitioningBy(
+            (item) -> productName.equalsIgnoreCase(item.getProduct().getShortname()
+            )));
         final List<CartItem> cartItems = filtered.get(false);
         cartItemRepository.deleteInBatch(filtered.get(true));
         existing.setItems(cartItems.stream().collect(Collectors.toSet()));

@@ -1,0 +1,12 @@
+{
+  "name": "RESTful Shop Cart",
+  "description": "RESTful Shop Cart Example using Spring Framework",
+  "logo": "https://duke.kenai.com/iconSized/duke.gif",
+  "success_url": "/",
+  "keywords": [
+    "heroku",
+    "java",
+    "java8",
+    "rest"
+  ]
+}

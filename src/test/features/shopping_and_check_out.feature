@@ -21,14 +21,15 @@ Feature: Shop Cart
             | budi   | 2 | calculator   | 0.75 |
             | budi   | 1 | hand-watch   | 100  |
             | budi   | 1 | ehair-cutter | 175  |
-        When achmad checks out the cart
-        And ilham checks out the cart
-        And nasir checks out the cart with coupon welcome
-        And budi checks out the cart with coupon ramadhan
-        Then achmad confirms he has USD 470 invoice
-        And ilham confirms he has USD 221.5 invoice
-        And nasir confirms he has USD 467 invoice
-        And budi confirms he has USD 210.425 invoice
+        Then achmad checks out the cart and got USD 470 invoice
+        And ilham checks out the cart and got USD 221.5 invoice
+        And nasir checks out the cart with coupon welcome and got USD 467 invoice
+        And budi checks out the cart with coupon ramadhan and got USD 210.425 invoice
         And achmad cancel the sound-system
-        And achmad checks out the cart
-        And achmad confirms he has USD 120 invoice
+        And achmad checks out the cart and got USD 120 invoice
+
+    Scenario: Do shopping with some non existent product and checkout the cart
+        Given database preparation
+        And visitors pick non existent items:
+            | achmad | 1 | xxx        | 100 |
+        Then achmad checks out the cart and got nothing

@@ -82,9 +82,4 @@ jhipster:
 
 security:
     basic:
-        enabled: true
-        path: /api/**
-    user:
-        name: user
-        password: user
-        role: USER
+        enabled: false
