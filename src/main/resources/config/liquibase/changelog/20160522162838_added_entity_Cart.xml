@@ -24,6 +24,10 @@
             <column name="amount" type="double">
                 <constraints nullable="true" />
             </column>
+            
+            <column name="session" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
                         <column name="coupon_id" type="bigint">
                 <constraints unique="true" nullable="true" />
             </column>

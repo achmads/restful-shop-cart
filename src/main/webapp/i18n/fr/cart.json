@@ -17,6 +17,7 @@
                 "title": "Cart"
             },
             "amount": "Amount",
+            "session": "Session",
             "items": "Items",
             "coupon": "Coupon"
         }

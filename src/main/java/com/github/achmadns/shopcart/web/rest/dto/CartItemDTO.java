@@ -1,6 +1,8 @@
 package com.github.achmadns.shopcart.web.rest.dto;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Objects;
 
 
@@ -13,11 +15,13 @@ public class CartItemDTO implements Serializable {
 
     private Double price;
 
+    private Integer quantity;
+
 
     private Long productId;
-
+    
     private Long cartId;
-
+    
     public Long getId() {
         return id;
     }
@@ -31,6 +35,13 @@ public class CartItemDTO implements Serializable {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     public Long getProductId() {
@@ -75,6 +86,7 @@ public class CartItemDTO implements Serializable {
         return "CartItemDTO{" +
             "id=" + id +
             ", price='" + price + "'" +
+            ", quantity='" + quantity + "'" +
             '}';
     }
 }

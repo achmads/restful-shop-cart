@@ -22,6 +22,11 @@
       "fieldId": 1,
       "fieldName": "amount",
       "fieldType": "Double"
+    },
+    {
+      "fieldId": 2,
+      "fieldName": "session",
+      "fieldType": "String"
     }
   ],
   "changelogDate": "20160522162838",

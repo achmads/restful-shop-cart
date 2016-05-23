@@ -17,6 +17,7 @@
                 "title": "Cart Item"
             },
             "price": "Price",
+            "quantity": "Quantity",
             "product": "Product",
             "cart": "Cart"
         }

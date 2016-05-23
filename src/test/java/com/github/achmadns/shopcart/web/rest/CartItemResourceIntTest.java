@@ -47,6 +47,9 @@ public class CartItemResourceIntTest {
     private static final Double DEFAULT_PRICE = 1D;
     private static final Double UPDATED_PRICE = 2D;
 
+    private static final Integer DEFAULT_QUANTITY = 1;
+    private static final Integer UPDATED_QUANTITY = 2;
+
     @Inject
     private CartItemRepository cartItemRepository;
 
@@ -78,6 +81,7 @@ public class CartItemResourceIntTest {
     public void initTest() {
         cartItem = new CartItem();
         cartItem.setPrice(DEFAULT_PRICE);
+        cartItem.setQuantity(DEFAULT_QUANTITY);
     }
 
     @Test
@@ -98,6 +102,7 @@ public class CartItemResourceIntTest {
         assertThat(cartItems).hasSize(databaseSizeBeforeCreate + 1);
         CartItem testCartItem = cartItems.get(cartItems.size() - 1);
         assertThat(testCartItem.getPrice()).isEqualTo(DEFAULT_PRICE);
+        assertThat(testCartItem.getQuantity()).isEqualTo(DEFAULT_QUANTITY);
     }
 
     @Test
@@ -111,7 +116,8 @@ public class CartItemResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(cartItem.getId().intValue())))
-                .andExpect(jsonPath("$.[*].price").value(hasItem(DEFAULT_PRICE.doubleValue())));
+                .andExpect(jsonPath("$.[*].price").value(hasItem(DEFAULT_PRICE.doubleValue())))
+                .andExpect(jsonPath("$.[*].quantity").value(hasItem(DEFAULT_QUANTITY)));
     }
 
     @Test
@@ -125,7 +131,8 @@ public class CartItemResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id").value(cartItem.getId().intValue()))
-            .andExpect(jsonPath("$.price").value(DEFAULT_PRICE.doubleValue()));
+            .andExpect(jsonPath("$.price").value(DEFAULT_PRICE.doubleValue()))
+            .andExpect(jsonPath("$.quantity").value(DEFAULT_QUANTITY));
     }
 
     @Test
@@ -147,6 +154,7 @@ public class CartItemResourceIntTest {
         CartItem updatedCartItem = new CartItem();
         updatedCartItem.setId(cartItem.getId());
         updatedCartItem.setPrice(UPDATED_PRICE);
+        updatedCartItem.setQuantity(UPDATED_QUANTITY);
         CartItemDTO cartItemDTO = cartItemMapper.cartItemToCartItemDTO(updatedCartItem);
 
         restCartItemMockMvc.perform(put("/api/cart-items")
@@ -159,6 +167,7 @@ public class CartItemResourceIntTest {
         assertThat(cartItems).hasSize(databaseSizeBeforeUpdate);
         CartItem testCartItem = cartItems.get(cartItems.size() - 1);
         assertThat(testCartItem.getPrice()).isEqualTo(UPDATED_PRICE);
+        assertThat(testCartItem.getQuantity()).isEqualTo(UPDATED_QUANTITY);
     }
 
     @Test

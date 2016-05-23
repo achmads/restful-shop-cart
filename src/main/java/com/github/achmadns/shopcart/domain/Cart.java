@@ -24,6 +24,9 @@ public class Cart implements Serializable {
     @Column(name = "amount")
     private Double amount;
 
+    @Column(name = "session")
+    private String session;
+
     @OneToMany(mappedBy = "cart")
     @JsonIgnore
     private Set<CartItem> items = new HashSet<>();
@@ -46,6 +49,14 @@ public class Cart implements Serializable {
 
     public void setAmount(Double amount) {
         this.amount = amount;
+    }
+
+    public String getSession() {
+        return session;
+    }
+
+    public void setSession(String session) {
+        this.session = session;
     }
 
     public Set<CartItem> getItems() {
@@ -89,6 +100,7 @@ public class Cart implements Serializable {
         return "Cart{" +
             "id=" + id +
             ", amount='" + amount + "'" +
+            ", session='" + session + "'" +
             '}';
     }
 }

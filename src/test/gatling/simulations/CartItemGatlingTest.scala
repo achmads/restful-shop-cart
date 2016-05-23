@@ -67,7 +67,7 @@ class CartItemGatlingTest extends Simulation {
             .exec(http("Create new cartItem")
             .post("/api/cart-items")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "price":null}""")).asJSON
+            .body(StringBody("""{"id":null, "price":null, "quantity":"0"}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_cartItem_url"))).exitHereIfFailed
             .pause(10)

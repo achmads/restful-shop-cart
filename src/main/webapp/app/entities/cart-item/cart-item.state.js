@@ -72,6 +72,7 @@
                         entity: function () {
                             return {
                                 price: null,
+                                quantity: null,
                                 id: null
                             };
                         }

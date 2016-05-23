@@ -24,9 +24,15 @@
             <column name="price" type="double">
                 <constraints nullable="true" />
             </column>
-                        <column name="product_id" type="bigint">
-                <constraints unique="true" nullable="true" />
+            
+            <column name="quantity" type="integer">
+                <constraints nullable="true" />
             </column>
+            
+            <column name="product_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+
             <column name="cart_id" type="bigint">
                 <constraints nullable="true" />
             </column>

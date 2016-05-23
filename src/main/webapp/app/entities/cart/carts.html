@@ -20,6 +20,7 @@
                 <tr>
                     <th><span translate="global.field.id">ID</span></th>
                     <th><span translate="jhipsterApp.cart.amount">Amount</span></th>
+                    <th><span translate="jhipsterApp.cart.session">Session</span></th>
                     <th><span translate="jhipsterApp.cart.coupon">Coupon</span></th>
                     <th></th>
                 </tr>
@@ -28,6 +29,7 @@
                 <tr ng-repeat="cart in vm.carts track by cart.id">
                     <td><a ui-sref="cart-detail({id:cart.id})">{{cart.id}}</a></td>
                     <td>{{cart.amount}}</td>
+                    <td>{{cart.session}}</td>
                     <td>
                         <a ui-sref="coupon-detail({id:cart.coupon.id})">{{cart.coupon.id}}</a>
                     </td>

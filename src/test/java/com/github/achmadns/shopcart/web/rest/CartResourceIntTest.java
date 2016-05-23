@@ -44,6 +44,8 @@ public class CartResourceIntTest {
 
     private static final Double DEFAULT_AMOUNT = 1D;
     private static final Double UPDATED_AMOUNT = 2D;
+    private static final String DEFAULT_SESSION = "AAAAA";
+    private static final String UPDATED_SESSION = "BBBBB";
 
     @Inject
     private CartRepository cartRepository;
@@ -72,6 +74,7 @@ public class CartResourceIntTest {
     public void initTest() {
         cart = new Cart();
         cart.setAmount(DEFAULT_AMOUNT);
+        cart.setSession(DEFAULT_SESSION);
     }
 
     @Test
@@ -91,6 +94,7 @@ public class CartResourceIntTest {
         assertThat(carts).hasSize(databaseSizeBeforeCreate + 1);
         Cart testCart = carts.get(carts.size() - 1);
         assertThat(testCart.getAmount()).isEqualTo(DEFAULT_AMOUNT);
+        assertThat(testCart.getSession()).isEqualTo(DEFAULT_SESSION);
     }
 
     @Test
@@ -104,7 +108,8 @@ public class CartResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(cart.getId().intValue())))
-                .andExpect(jsonPath("$.[*].amount").value(hasItem(DEFAULT_AMOUNT.doubleValue())));
+                .andExpect(jsonPath("$.[*].amount").value(hasItem(DEFAULT_AMOUNT.doubleValue())))
+                .andExpect(jsonPath("$.[*].session").value(hasItem(DEFAULT_SESSION.toString())));
     }
 
     @Test
@@ -118,7 +123,8 @@ public class CartResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id").value(cart.getId().intValue()))
-            .andExpect(jsonPath("$.amount").value(DEFAULT_AMOUNT.doubleValue()));
+            .andExpect(jsonPath("$.amount").value(DEFAULT_AMOUNT.doubleValue()))
+            .andExpect(jsonPath("$.session").value(DEFAULT_SESSION.toString()));
     }
 
     @Test
@@ -140,6 +146,7 @@ public class CartResourceIntTest {
         Cart updatedCart = new Cart();
         updatedCart.setId(cart.getId());
         updatedCart.setAmount(UPDATED_AMOUNT);
+        updatedCart.setSession(UPDATED_SESSION);
 
         restCartMockMvc.perform(put("/api/carts")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -151,6 +158,7 @@ public class CartResourceIntTest {
         assertThat(carts).hasSize(databaseSizeBeforeUpdate);
         Cart testCart = carts.get(carts.size() - 1);
         assertThat(testCart.getAmount()).isEqualTo(UPDATED_AMOUNT);
+        assertThat(testCart.getSession()).isEqualTo(UPDATED_SESSION);
     }
 
     @Test

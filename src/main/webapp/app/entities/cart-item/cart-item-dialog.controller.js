@@ -5,20 +5,12 @@
         .module('jhipsterApp')
         .controller('CartItemDialogController', CartItemDialogController);
 
-    CartItemDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', '$q', 'entity', 'CartItem', 'Product', 'Cart'];
+    CartItemDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'CartItem', 'Product', 'Cart'];
 
-    function CartItemDialogController ($timeout, $scope, $stateParams, $uibModalInstance, $q, entity, CartItem, Product, Cart) {
+    function CartItemDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, CartItem, Product, Cart) {
         var vm = this;
         vm.cartItem = entity;
-        vm.products = Product.query({filter: 'cartitem-is-null'});
-        $q.all([vm.cartItem.$promise, vm.products.$promise]).then(function() {
-            if (!vm.cartItem.productId) {
-                return $q.reject();
-            }
-            return Product.get({id : vm.cartItem.productId}).$promise;
-        }).then(function(product) {
-            vm.products.push(product);
-        });
+        vm.products = Product.query();
         vm.carts = Cart.query();
 
         $timeout(function (){

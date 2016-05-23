@@ -21,8 +21,10 @@ public class CartItem implements Serializable {
     @Column(name = "price")
     private Double price;
 
-    @OneToOne
-    @JoinColumn(unique = true)
+    @Column(name = "quantity")
+    private Integer quantity;
+
+    @ManyToOne
     private Product product;
 
     @ManyToOne
@@ -42,6 +44,14 @@ public class CartItem implements Serializable {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     public Product getProduct() {
@@ -85,6 +95,7 @@ public class CartItem implements Serializable {
         return "CartItem{" +
             "id=" + id +
             ", price='" + price + "'" +
+            ", quantity='" + quantity + "'" +
             '}';
     }
 }

@@ -20,6 +20,7 @@
                 <tr>
                     <th><span translate="global.field.id">ID</span></th>
                     <th><span translate="jhipsterApp.cartItem.price">Price</span></th>
+                    <th><span translate="jhipsterApp.cartItem.quantity">Quantity</span></th>
                     <th><span translate="jhipsterApp.cartItem.product">Product</span></th>
                     <th><span translate="jhipsterApp.cartItem.cart">Cart</span></th>
                     <th></th>
@@ -29,6 +30,7 @@
                 <tr ng-repeat="cartItem in vm.cartItems track by cartItem.id">
                     <td><a ui-sref="cart-item-detail({id:cartItem.id})">{{cartItem.id}}</a></td>
                     <td>{{cartItem.price}}</td>
+                    <td>{{cartItem.quantity}}</td>
                     <td>
                         <a ui-sref="product-detail({id:cartItem.productId})">{{cartItem.productId}}</a>
                     </td>

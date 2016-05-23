@@ -4,7 +4,7 @@
       "relationshipId": 1,
       "relationshipName": "product",
       "otherEntityName": "product",
-      "relationshipType": "one-to-one",
+      "relationshipType": "many-to-one",
       "otherEntityField": "id",
       "ownerSide": true,
       "otherEntityRelationshipName": "cartItem"
@@ -22,6 +22,11 @@
       "fieldId": 1,
       "fieldName": "price",
       "fieldType": "Double"
+    },
+    {
+      "fieldId": 2,
+      "fieldName": "quantity",
+      "fieldType": "Integer"
     }
   ],
   "changelogDate": "20160522162836",

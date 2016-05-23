@@ -72,6 +72,7 @@
                         entity: function () {
                             return {
                                 amount: null,
+                                session: null,
                                 id: null
                             };
                         }
