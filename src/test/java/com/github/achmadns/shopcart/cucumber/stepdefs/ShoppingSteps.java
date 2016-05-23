@@ -1,5 +1,9 @@
 package com.github.achmadns.shopcart.cucumber.stepdefs;
 
+import com.github.achmadns.shopcart.repository.CartItemRepository;
+import com.github.achmadns.shopcart.repository.CartRepository;
+import com.github.achmadns.shopcart.web.rest.dto.CartDTO;
+import com.github.achmadns.shopcart.web.rest.dto.CartItemDTO;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -8,13 +12,18 @@ import gherkin.formatter.model.DataTableRow;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.OK;
 
 public class ShoppingSteps extends StepDefs {
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -22,39 +31,57 @@ public class ShoppingSteps extends StepDefs {
     @Value("http://localhost:${local.server.port}")
     private String baseUrl;
     private final Map<String, Double> invoices = new HashMap<>(4);
+    @Inject
+    private CartRepository cartRepository;
+    @Inject
+    private CartItemRepository cartItemRepository;
+
+    @Given("database preparation")
+    @Transactional
+    public void clean_db() {
+        cartRepository.deleteAll();
+        assertThat(cartItemRepository.count()).isEqualTo(0L);
+        assertThat(cartRepository.count()).isEqualTo(0L);
+    }
 
     @Given("^visitors pick their items:")
     public void pick_items(DataTable data) throws Throwable {
         // example
         // | achmad | 1 | tv           | 100  |
         for (DataTableRow row : data.getGherkinRows()) {
-            // TODO parse each row and post the item
             final List<String> cells = row.getCells();
             log.info("Data line {}: {}", row.getLine(), cells);
+            final HttpStatus statusCode = rest.postForEntity(baseUrl + "/api/carts/{visitor}/item/{quantity}/{productShortName}", null,
+                CartItemDTO.class, cells.subList(0, cells.size() - 1).toArray(new Object[]{})).getStatusCode();
+            assertThat(statusCode).isEqualTo(OK);
         }
     }
 
     @When("^([\\w]*) checks out the cart$")
     public void checkout_cart(String visitor) {
         log.info("visitor", visitor);
-        // TODO checkout
+        final ResponseEntity<CartDTO> response = rest.getForEntity(baseUrl + "/api/carts/invoice/{coupon}", CartDTO.class, visitor);
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        invoices.put(visitor, response.getBody().getTotal());
     }
 
     @When("^([\\w]*) checks out the cart with coupon ([\\w]*)$")
     public void checkout_cart_with_coupon(String visitor, String coupon) {
         log.info("{} checks out with coupon {}", visitor, coupon);
-        // TODO checkout with coupon
+        final ResponseEntity<CartDTO> response = rest.getForEntity(baseUrl + "/api/carts/invoice/{visitor}/coupon/{coupon}", CartDTO.class, visitor, coupon);
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        invoices.put(visitor, response.getBody().getTotal());
     }
 
     @Then("^([\\w]*) confirms he has USD ([\\d\\.]*) invoice$")
     public void check_invoice(String visitor, Double invoice) {
         log.info("{} has to pay USD {}", visitor, invoice);
-//        assertThat(invoices.get(visitor)).isEqualTo(invoice);
+        assertThat(invoices.get(visitor)).isEqualTo(invoice);
     }
 
     @Then("^([\\w]*) cancel the ([\\w-]+)$")
-    public void cancel_item(String visitor, String itemName) {
-        log.info("{} cancel {}", visitor, itemName);
-        // TODO cancel the cart item
+    public void cancel_item(String visitor, String productShortName) {
+        log.info("{} cancel {}", visitor, productShortName);
+        rest.delete(baseUrl + "/api/carts/{visitor}/item/{productShortName}", visitor, productShortName);
     }
 }

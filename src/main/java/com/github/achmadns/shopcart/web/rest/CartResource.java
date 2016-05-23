@@ -15,7 +15,6 @@ import com.github.achmadns.shopcart.web.rest.mapper.CartItemMapper;
 import com.github.achmadns.shopcart.web.rest.util.HeaderUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,7 +54,7 @@ public class CartResource {
     private CartItemMapper cartItemMapper;
     @Inject
     private CouponRepository couponRepository;
-    private final Map<String, Cart> carts = new ConcurrentHashMap<>(4);
+    private final Map<String, Long> carts = new ConcurrentHashMap<>(4);
 
     @RequestMapping(value = "/carts/{visitor:.+}/item/{quantity}/{productName}",
         method = RequestMethod.POST,
@@ -65,26 +64,18 @@ public class CartResource {
                                            @PathVariable("quantity") int quantity,
                                            @PathVariable("productName") String productName) {
         final CartItemDTO item = new CartItemDTO();
-        final Cart cart = carts.get(visitor);
+        final Long cartId = carts.get(visitor);
+        final Cart cart = cartId == null ? new Cart() : cartRepository.findOne(cartId);
         final CartItem cartItem = new CartItem();
         final Optional<Product> product = productRepository.findByShortname(productName);
         if (!product.isPresent())
             return ResponseEntity.badRequest().body(item);
         cartItem.setProduct(product.get());
         cartItem.setPrice(product.get().getPrice() * quantity);
-        if (null == cart) {
-            final Cart brandNew = new Cart();
-            final HashSet<CartItem> items = new HashSet<>();
-            items.add(cartItem);
-            brandNew.setItems(items);
-            cartItem.setCart(brandNew);
-            carts.put(visitor, brandNew);
-            cartRepository.saveAndFlush(brandNew);
-        } else {
-            cartItem.setCart(cart);
-            cart.getItems().add(cartItem);
-            cartRepository.saveAndFlush(cart);
-        }
+        cartItem.setCart(cart);
+        cart.getItems().add(cartItem);
+        cartRepository.saveAndFlush(cart);
+        if (null == cartId) carts.put(visitor, cart.getId());
         cartItemRepository.saveAndFlush(cartItem);
         item.setId(cartItem.getId());
         item.setPrice(cartItem.getPrice());
@@ -99,16 +90,18 @@ public class CartResource {
     @Transactional
     public void remove(@PathVariable("visitor") String visitor,
                        @PathVariable("productName") String productName) {
-        final Cart cart = carts.get(visitor);
+        final Cart cart = cartRepository.findOne(carts.get(visitor));
         if (null == cart)
             return;
         final Set<CartItem> items = cart.getItems();
-        final List<CartItem> cartItems = items.stream().collect(Collectors.partitioningBy(new Predicate<CartItem>() {
+        final Map<Boolean, List<CartItem>> filtered = items.stream().collect(Collectors.partitioningBy(new Predicate<CartItem>() {
             @Override
             public boolean test(CartItem cartItem) {
                 return productName.equalsIgnoreCase(cartItem.getProduct().getShortname());
             }
-        })).get(false);
+        }));
+        final List<CartItem> cartItems = filtered.get(false);
+        cartItemRepository.deleteInBatch(filtered.get(true));
         cart.setItems(cartItems.stream().collect(Collectors.toSet()));
         cartRepository.saveAndFlush(cart);
     }
@@ -119,7 +112,7 @@ public class CartResource {
     @Transactional
     public ResponseEntity<CartDTO> getInvoice(@PathVariable("visitor") String visitor) {
         final CartDTO dto = new CartDTO();
-        final Cart cart = carts.get(visitor);
+        final Cart cart = cartRepository.findOne(carts.get(visitor));
         if (null == cart)
             return ResponseEntity.badRequest().body(dto);
         dto.setTotal(processCartItems(dto, cart));
@@ -144,7 +137,7 @@ public class CartResource {
     public ResponseEntity<CartDTO> getInvoiceWithCoupon(@PathVariable("visitor") String visitor,
                                                         @PathVariable("coupon") String code) {
         final CartDTO dto = new CartDTO();
-        final Cart cart = carts.get(visitor);
+        final Cart cart = cartRepository.findOne(carts.get(visitor));
         if (null == cart)
             return ResponseEntity.badRequest().body(dto);
         final Double total = processCartItems(dto, cart);

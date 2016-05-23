@@ -65,7 +65,7 @@ public class ShoppingEndpointsIntTest {
             null, CartItemDTO.class);
         assertThat(response.getStatusCode()).isEqualTo(OK);
         final CartItemDTO item = response.getBody();
-        assertThat(item.getPrice()).isEqualTo(200D);
+        assertThat(item.getPrice()).isEqualTo(20D);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ShoppingEndpointsIntTest {
         final CartDTO cart = response.getBody();
         assertThat(cart.getDiscount()).isNotNull();
         assertThat(cart.getItems().size()).isEqualTo(2);
-        assertThat(cart.getTotal()).isEqualTo(285D);
+        assertThat(cart.getTotal()).isEqualTo(114D);
     }
 
     @Test
@@ -90,6 +90,6 @@ public class ShoppingEndpointsIntTest {
         final CartDTO cart = response.getBody();
         assertThat(cart.getDiscount()).isNotNull();
         assertThat(cart.getItems().size()).isEqualTo(1);
-        assertThat(cart.getTotal()).isEqualTo(197);
+        assertThat(cart.getTotal()).isEqualTo(17D);
     }
 }

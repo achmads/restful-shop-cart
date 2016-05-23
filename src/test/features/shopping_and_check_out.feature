@@ -7,7 +7,8 @@ Feature: Shop Cart
     To make it simple, the session is identified by visitor name to maintain their state.
 
     Scenario: Do shopping and checkout the cart
-        Given visitors pick their items:
+        Given database preparation
+        And visitors pick their items:
             | achmad | 1 | tv           | 100  |
             | achmad | 2 | wall-clock   | 10   |
             | achmad | 1 | sound-system | 350  |
@@ -24,10 +25,10 @@ Feature: Shop Cart
         And ilham checks out the cart
         And nasir checks out the cart with coupon welcome
         And budi checks out the cart with coupon ramadhan
-        Then achmad confirms he has USD 460 invoice
-        And ilham confirms he has USD 220.75 invoice
-        And nasir confirms he has USD 545 invoice
-        And budi confirms he has USD 261.9625 invoice
+        Then achmad confirms he has USD 470 invoice
+        And ilham confirms he has USD 221.5 invoice
+        And nasir confirms he has USD 467 invoice
+        And budi confirms he has USD 210.425 invoice
         And achmad cancel the sound-system
         And achmad checks out the cart
-        And achmad confirms he has USD 110 invoice
+        And achmad confirms he has USD 120 invoice
